@@ -1,0 +1,41 @@
+name: Deploy iam-tool to the development stand
+on: workflow_dispatch
+permissions: {}
+env:
+  CONTAINER_NAME: ${{ github.event.repository.name }}
+jobs:
+  deploy_iam-tool:
+    name: Deploy iam-tool
+    permissions:
+      contents: read
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Run container
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: ${{ secrets.SSH_PORT }}
+          script: |
+            docker stop ${{ env.CONTAINER_NAME }} || true
+            docker rm ${{ env.CONTAINER_NAME }} || true
+            docker volume create iam-tool_vol || true
+            docker run -d \
+              --name ${{ env.CONTAINER_NAME }} \
+              --restart unless-stopped \
+              --network database_net \
+              -e TZ=Europe/Moscow \
+              -e KC_HTTP_ENABLED=true \
+              -e KC_HOSTNAME: ${{ vars.IAM_TOOL_HOSTNAME }} \
+              -e KC_BOOTSTRAP_ADMIN_USERNAME=${{ secrets.KC_BOOTSTRAP_ADMIN_USERNAME }} \
+              -e KC_BOOTSTRAP_ADMIN_PASSWORD=${{ secrets.KC_BOOTSTRAP_ADMIN_PASSWORD }} \
+              -e KC_DB_URL_HOST=${{ secrets.KC_DB_URL_HOST }} \
+              -e KC_DB_URL_PORT=${{ secrets.KC_DB_URL_PORT }} \
+              -e KC_DB_URL_DATABASE=${{ secrets.KC_DB_URL_DATABASE }} \
+              -e KC_DB_USERNAME=${{ secrets.KC_DB_USERNAME }} \
+              -e KC_DB_PASSWORD=${{ secrets.KC_DB_PASSWORD }} \
+              -v iam-tool_vol:/var/lib/pgadmin \
+              -p ${{ vars.IAM_TOOL_PORT }}:8080 \
+              ${{ vars.IAM_TOOL_IMAGE }} \
+              start --optimized
