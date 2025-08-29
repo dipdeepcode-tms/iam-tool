@@ -35,7 +35,7 @@ jobs:
               -e KC_DB_URL_DATABASE=${{ secrets.KC_DB_URL_DATABASE }} \
               -e KC_DB_USERNAME=${{ secrets.KC_DB_USERNAME }} \
               -e KC_DB_PASSWORD=${{ secrets.KC_DB_PASSWORD }} \
-              -v iam-tool_vol:/var/lib/pgadmin \
+              -v iam-tool_vol:/opt/keycloak/data \
               -p ${{ vars.IAM_TOOL_PORT }}:8080 \
               ${{ vars.IAM_TOOL_IMAGE }} \
               start --optimized
