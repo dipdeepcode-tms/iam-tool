@@ -27,7 +27,7 @@ jobs:
               --network database_net \
               -e TZ=Europe/Moscow \
               -e KC_HTTP_ENABLED=true \
-              -e KC_HOSTNAME: ${{ vars.IAM_TOOL_HOSTNAME }} \
+              -e KC_HOSTNAME=${{ vars.IAM_TOOL_HOSTNAME }} \
               -e KC_BOOTSTRAP_ADMIN_USERNAME=${{ secrets.KC_BOOTSTRAP_ADMIN_USERNAME }} \
               -e KC_BOOTSTRAP_ADMIN_PASSWORD="${{ secrets.KC_BOOTSTRAP_ADMIN_PASSWORD }}" \
               -e KC_DB_URL_HOST=${{ secrets.KC_DB_URL_HOST }} \
